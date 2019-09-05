@@ -1,7 +1,5 @@
 package com.jerry.dupstat.domain;
 
-import org.springframework.context.annotation.Bean;
-
 import java.util.List;
 
 public class Login {

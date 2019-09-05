@@ -4,30 +4,35 @@ import java.security.MessageDigest;
 
 public class MD5 {
     //十六进制下数字到字符的映射数组
-    private final static String[] hexDigits = {"0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"};
+    private final static String[] hexDigits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 
-    /**把inputString加密*/
-    public String Encript(String inputStr){
+    /**
+     * 把inputString加密
+     */
+    public String Encript(String inputStr) {
         return encodeByMD5(inputStr);
     }
 
     /**
      * 验证输入的密码是否正确
-     * @param password 真正的密码（加密后的真密码）
+     *
+     * @param password    真正的密码（加密后的真密码）
      * @param inputString 输入的字符串
      * @return 验证结果，boolean类型
      */
-    public boolean authenticatePassword(String password,String inputString){
-        if(password.equals(encodeByMD5(inputString))){
+    public boolean authenticatePassword(String password, String inputString) {
+        if (password.equals(encodeByMD5(inputString))) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
-    /**对字符串进行MD5编码*/
-    private String encodeByMD5(String originString){
-        if (originString!=null) {
+    /**
+     * 对字符串进行MD5编码
+     */
+    private String encodeByMD5(String originString) {
+        if (originString != null) {
             try {
                 //创建具有指定算法名称的信息摘要
                 MessageDigest md5 = MessageDigest.getInstance("MD5");
@@ -45,24 +50,25 @@ public class MD5 {
 
     /**
      * 轮换字节数组为十六进制字符串
+     *
      * @param b 字节数组
      * @return 十六进制字符串
      */
-    private String byteArrayToHexString(byte[] b){
+    private String byteArrayToHexString(byte[] b) {
         StringBuffer resultSb = new StringBuffer();
-        for(int i=0;i<b.length;i++){
+        for (int i = 0; i < b.length; i++) {
             resultSb.append(byteToHexString(b[i]));
         }
         return resultSb.toString();
     }
 
     //将一个字节转化成十六进制形式的字符串
-    private String byteToHexString(byte b){
+    private String byteToHexString(byte b) {
         int n = b;
-        if(n<0)
-            n=256+n;
-        int d1 = n/16;
-        int d2 = n%16;
+        if (n < 0)
+            n = 256 + n;
+        int d1 = n / 16;
+        int d2 = n % 16;
         return hexDigits[d1] + hexDigits[d2];
     }
 }

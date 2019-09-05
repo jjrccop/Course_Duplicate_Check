@@ -20,13 +20,13 @@
         <th>姓名</th>
     </tr>
     <c:forEach items="${res}" var="partTime">
-    <tr>
-        <td><fmt:formatDate value="${partTime.startTime}" pattern="yyyy-MM-dd HH:mm"/> </td>
-        <td><fmt:formatDate value="${partTime.endTime}" pattern="yyyy-MM-dd HH:mm"/></td>
-        <td><c:forEach items="${partTime.nameList}" var="name">
-            ${name}&nbsp;
-        </c:forEach></td>
-    </tr>
+        <tr>
+            <td><fmt:formatDate value="${partTime.startTime}" pattern="yyyy-MM-dd HH:mm"/></td>
+            <td><fmt:formatDate value="${partTime.endTime}" pattern="yyyy-MM-dd HH:mm"/></td>
+            <td><c:forEach items="${partTime.nameList}" var="name">
+                ${name}&nbsp;
+            </c:forEach></td>
+        </tr>
     </c:forEach>
 </table>
 </body>

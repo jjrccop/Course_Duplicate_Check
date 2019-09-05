@@ -12,6 +12,7 @@
     <title>Title</title>
 </head>
 <body>
+${warning}
 <form action="/query" method="post">
     <label>
         <input type="text" name="part">
@@ -24,9 +25,9 @@
     <th>学号</th>
 
     <c:forEach items="${participants}" var="part">
-    <tr>
-        <td>${part}</td>
-    </tr>
+        <tr>
+            <td>${part}</td>
+        </tr>
     </c:forEach>
 
 </table>
