@@ -1,35 +1,49 @@
 package com.jerry.dupstat.service.Impl;
 
+import com.jerry.dupstat.domain.Login;
+import com.jerry.dupstat.domain.PerTime;
 import com.jerry.dupstat.domain.Summary;
 import com.jerry.dupstat.service.SummaryService;
 import com.jerry.dupstat.util.CourseStat;
 import com.jerry.dupstat.util.DateUtil;
-import com.jerry.dupstat.util.Login;
+import com.jerry.dupstat.util.SysConstant;
+import javafx.util.Pair;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Service
 public class SummaryServiceImpl implements SummaryService {
 
-    private Summary summary;
+    public Summary doSummary(Login login){
 
-    public Summary getSummary() {
-        return summary;
-    }
+        String sessionId_1=login.getSessionId_1();
+        String sessionId_2=login.getSessionId_2();
+        List<String> participants=login.getParticipants();
 
-    public void setSummary(Summary summary) {
-        this.summary = summary;
-    }
+        List<Document> docs=new ArrayList<>();
+        for(String participant:participants){
+            try{
+                docs.add(Jsoup.connect(SysConstant.ProductionSchedule+participant)
+                        .cookie("ASP.NET_SessionId",sessionId_1)
+                        .cookie("UserTokeID",sessionId_2)
+                        .timeout(SysConstant.Wait_Time)
+                        .post());
+            }catch (Exception e){
+                docs.add(null);
+            }
+        }
 
-    public void doSummary(){
-        List<Document> docs= Login.Login(getSummary().getUser());
+        Summary summary=new Summary();
         Map<Integer,List<String>> res=new HashMap<>();
         for(int i=0;i<1596;i++){
             res.put(i,new ArrayList<>());
         }
 
-        if(docs==null) return;
         CourseStat courseStat=new CourseStat();
         boolean flag=false;
         for(Document doc:docs){
@@ -37,7 +51,7 @@ public class SummaryServiceImpl implements SummaryService {
             String name=courseStat.getName();
 
             if(!flag){
-                getSummary().setStartDate(courseStat.getStart());
+                summary.setStartDate(courseStat.getStart());
                 flag=true;
             }
             List<Integer> people=courseStat.doStatic();
@@ -50,14 +64,16 @@ public class SummaryServiceImpl implements SummaryService {
                 res.put(crs,tmp);
             }
         }
-        getSummary().setResult(res);
+        summary.setResult(res);
+        return summary;
     }
 
-    public void query(Date start, Date end){
-        Map<Integer,List<String>> res=getSummary().getResult();
+    public List<PerTime> query(Date start, Date end, Summary summary){
+        List<PerTime> ans = new ArrayList<>();
+        Map<Integer,List<String>> res=summary.getResult();
         Date first=new Date();
         try {
-            first=new SimpleDateFormat("yyyy/MM/dd").parse(getSummary().getStartDate());
+            first=new SimpleDateFormat("yyyy/MM/dd").parse(summary.getStartDate());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -66,14 +82,15 @@ public class SummaryServiceImpl implements SummaryService {
         for(Map.Entry<Integer,List<String>> entry:res.entrySet()){
             if(entry.getKey()>=(int) left&&entry.getKey()<=right){
                 if(entry.getValue().size()>0) {
-                    DateUtil.getTime(getSummary().getStartDate(),entry.getKey());
-                    System.out.println(entry.getValue().size());
-                    for(String name:entry.getValue()){
-                        System.out.print(name+" ");
-                    }
-                    System.out.println();
+                    Pair<Date,Date> curTime=DateUtil.getTime(summary.getStartDate(),entry.getKey());
+                    PerTime perTime=new PerTime();
+                    perTime.setStartTime(curTime.getKey());
+                    perTime.setEndTime(curTime.getValue());
+                    perTime.setNameList(entry.getValue());
+                    ans.add(perTime);
                 }
             }
         }
+        return ans;
     }
 }
